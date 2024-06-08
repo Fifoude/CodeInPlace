@@ -1,5 +1,5 @@
 
-MAX_NUMBER = 50
+MAX_NUMBER = 42
 
 def odd_numbers():
     for i in range(MAX_NUMBER):
