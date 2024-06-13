@@ -30,7 +30,6 @@ import matplotlib.pyplot as plt
 import csv
 
 
-
 # Initialize the main window
 root = tk.Tk()
 root.title("Olympics Medal Tally Tracker")
@@ -43,8 +42,13 @@ def display_data():
     with open('medal_data.csv', newline='') as f:
         reader = csv.reader(f)
         next(reader)  # Skip the header
-        for row in reader:
-            treeview.insert("", "end", values=row)
+        data = [row for row in reader]
+    
+    # Sort the data based on the total medals, then gold, silver, and bronze
+    data.sort(key=lambda x: (int(x[1]) + int(x[2]) + int(x[3]), int(x[1]), int(x[2]), int(x[3])), reverse=True)
+    
+    for row in data:
+        treeview.insert("", "end", values=row)
 
 # Function to create a medal chart
 def create_medal_chart():
@@ -226,7 +230,10 @@ display_button.grid(row=5, column=0, columnspan=2, pady=10)
 
 # Button to show medal chart
 chart_button = tk.Button(root, text="Show Medal Chart", command=create_medal_chart)
-chart_button.grid(row=9, column=0, columnspan=2, pady=10)
+chart_button.grid(row=6, column=1, columnspan=2, pady=10)
 
-# Start the GUI event loop
+# Initial display of data
+display_data()
+
+# Run the main loop
 root.mainloop()
