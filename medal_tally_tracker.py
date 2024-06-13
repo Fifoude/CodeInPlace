@@ -26,7 +26,9 @@ M2: Set Up Your Project and Read CSV Data
 import pandas as pd             # pandas 2.2.2 to work with datas https://pandas.pydata.org/pandas-docs/stable/getting_started/index.html
 import tkinter as tk
 from tkinter import messagebox, ttk  # https://docs.python.org/3/library/tkinter.messagebox.html
+import matplotlib.pyplot as plt
 
+# Function to read medal data
 def read_medal_data(csv_file):      # read CSV file and manage errors
     try:
         data = pd.read_csv(csv_file)
@@ -54,7 +56,32 @@ def display_data():
     for index, row in medal_data.iterrows():
         treeview.insert("", "end", values=(row['Country'], row['Gold'], row['Silver'], row['Bronze']))
 
+# Function to create a bar chart of medal counts
+def create_medal_chart():
+    medal_data = read_medal_data('medal_data.csv')
+    if medal_data is None:
+        return
+    
+    # Plotting
+    countries = medal_data['Country']
+    gold = medal_data['Gold']
+    silver = medal_data['Silver']
+    bronze = medal_data['Bronze']
 
+    x = range(len(countries))
+    
+    plt.figure(figsize=(10, 6))
+    plt.bar(x, gold, width=0.25, label='Gold', color='gold', align='center')
+    plt.bar(x, silver, width=0.25, label='Silver', color='silver', align='edge')
+    plt.bar(x, bronze, width=0.25, label='Bronze', color='#cd7f32', align='center')
+
+    plt.xlabel('Countries')
+    plt.ylabel('Medal Counts')
+    plt.title('Medal Distribution by Country')
+    plt.xticks(ticks=x, labels=countries, rotation='vertical')
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
 
 
 # Initialize the main window
@@ -65,10 +92,22 @@ root.geometry("600x400")
 # Create treeview for displaying data
 columns = ("Country", "Gold", "Silver", "Bronze")
 treeview = ttk.Treeview(root, columns=columns, show='headings')
-for col in columns:
-    treeview.heading(col, text=col)
-    treeview.grid(row=6, column=0, columnspan=2)
+treeview.grid(row=6, column=0, columnspan=2, sticky='nsew')
 
+# Configure column widths
+treeview.column("Country", width=200)
+treeview.column("Gold", width=100)
+treeview.column("Silver", width=100)
+treeview.column("Bronze", width=100)
+
+# Create scrollbars for the treeview
+treeview_scroll_y = ttk.Scrollbar(root, orient="vertical", command=treeview.yview)
+treeview_scroll_y.grid(row=6, column=2, sticky='ns')
+treeview.configure(yscrollcommand=treeview_scroll_y.set)
+
+treeview_scroll_x = ttk.Scrollbar(root, orient="horizontal", command=treeview.xview)
+treeview_scroll_x.grid(row=7, column=0, columnspan=2, sticky='ew')
+treeview.configure(xscrollcommand=treeview_scroll_x.set)
 
 # Entry and label for country name
 country_label = tk.Label(root, text="Country:")
@@ -129,6 +168,14 @@ def display_data():
 # Button to display data
 display_button = tk.Button(root, text="Display Medal Tally", command=display_data)
 display_button.grid(row=5, column=0, columnspan=2, pady=10)
+
+# Button to create and display medal chart
+chart_button = tk.Button(root, text="Show Medal Chart", command=create_medal_chart)
+chart_button.grid(row=8, column=0, columnspan=2, pady=10)
+
+# Configure grid to make treeview expandable
+root.grid_rowconfigure(6, weight=1)
+root.grid_columnconfigure(1, weight=1)
 
 # Initial call to display data
 display_data()
